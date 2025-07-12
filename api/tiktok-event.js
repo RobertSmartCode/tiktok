@@ -14,16 +14,22 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Tipo de evento no válido' });
   }
 
-  const pixelCode = process.env.TIKTOK_PIXEL_ID;
+  const pixel_code = process.env.TIKTOK_PIXEL_ID || 'D1OT0CJC77U5IDGMJ8DG' ;
   const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
 
-const eventData = {
-  pixelCode : 'D1OT0CJC77U5IDGMJ8DG' , // 👈 debe venir de .env
-  event: event,
-  timestamp: Math.floor(Date.now() / 1000),
+// 🛡️ Validación de seguridad antes de continuar
+  if (!pixel_code || !accessToken) {
+    return res.status(400).json({ error: 'Faltan variables de entorno necesarias' });
+  }
+
+
+  const eventData = {
+  pixel_code: pixel_code || 'D1OT0CJC77U5IDGMJ8DG', // fallback explícito
+  event,
+  timestamp: Date.now().toString(), // TikTok lo espera como string, no como número
   event_id: crypto.randomUUID(),
   properties: {
-    value: value || '',
+    value: value || 0,
     currency: 'USD'
   },
   context: {
@@ -34,13 +40,13 @@ const eventData = {
     page: {
       url: req.headers.referer || 'https://www.robertsmart.tech/'
     },
-    ad: {},
     event_source: {
       event_source_type: 'web',
-      event_source_id: 'www.robertsmart.tech'
+      event_source_id: 'robertsmart.tech'
     }
   }
 };
+
 
 
   try {
@@ -50,7 +56,8 @@ const eventData = {
         'Content-Type': 'application/json',
         'Access-Token': accessToken
       },
-      body: JSON.stringify({ data: [eventData] })
+   
+      body: JSON.stringify(eventData)
     });
 
     const result = await response.json();
