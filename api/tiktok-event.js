@@ -1,27 +1,28 @@
+// Archivo: api/tiktok-event.js
+
 export default async function handler(req, res) {
+  console.log("[DEBUG] Handler ejecutado");
+  console.log("[DEBUG] Method:", req.method);
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método no permitido' });
+    return res.status(405).json({ message: 'Método no permitido' });
   }
 
-  console.log('[INFO] Evento recibido');
-  console.log('[DEBUG] Body:', req.body);
-
   try {
-    const pixelCode = process.env.TIKTOK_PIXEL_ID;
-    const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
+    const { event, value } = req.body;
+    console.log("[DEBUG] Body recibido:", req.body);
 
-    if (!pixelCode || !accessToken) {
-      return res.status(500).json({ error: 'Faltan variables de entorno' });
+    // Validar datos básicos
+    if (!event || typeof value === 'undefined') {
+      return res.status(400).json({ message: 'Datos incompletos' });
     }
 
-    // Simulamos envío de evento (aquí puedes poner fetch real si quieres)
-    console.log('[ENV] Pixel:', pixelCode);
-    console.log('[ENV] Token:', accessToken);
-
-    return res.status(200).json({ message: 'Evento enviado', pixelCode });
+    // Aquí iría la lógica de envío a TikTok Events API
+    // Simulación de respuesta exitosa
+    return res.status(200).json({ message: 'Evento recibido', event, value });
 
   } catch (error) {
-    console.error('[ERROR]', error);
-    return res.status(500).json({ error: 'Error del servidor' });
+    console.error("[ERROR]", error);
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 }
