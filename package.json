@@ -1,6 +1,18 @@
 {
   "name": "tiktok-event-vercel",
   "version": "1.0.0",
+  "description": "Función serverless para enviar eventos a la API de TikTok desde un backend en Vercel.",
+  "author": "Robert Smart",
+  "license": "MIT",
   "type": "module",
-  "dependencies": {}
+  "main": "api/tiktok-event.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node api/tiktok-event.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.x"
+  }
 }
+
