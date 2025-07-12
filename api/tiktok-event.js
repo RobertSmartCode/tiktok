@@ -1,52 +1,44 @@
-// /api/tiktok-event.js
-export default async function handler(req, res) {
-  console.log("🔵 Solicitud recibida");
+// Archivo: api/tiktok-event.js
 
-  if (req.method !== 'POST') {
-    console.warn("🟡 Método no permitido: ", req.method);
-    return res.status(405).json({ error: 'Método no permitido' });
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { event, timestamp, context, properties } = req.body;
-  console.log("🧩 Datos recibidos:", req.body);
+  const PIXEL_ID = process.env.TIKTOK_PIXEL_ID;
+  const ACCESS_TOKEN = process.env.TIKTOK_ACCESS_TOKEN;
 
-  if (!event || !timestamp || !context || !properties) {
-    console.error("🔴 Datos faltantes");
-    return res.status(400).json({ error: 'Faltan datos en la solicitud' });
+  if (!PIXEL_ID || !ACCESS_TOKEN) {
+    console.error("Faltan variables de entorno: TIKTOK_PIXEL_ID o TIKTOK_ACCESS_TOKEN");
+    return res.status(500).json({ error: "Faltan variables de entorno" });
   }
 
   try {
-    const tiktokURL = "https://business-api.tiktok.com/open_api/v1.2/pixel/track/";
-    const body = {
-      pixel_code: process.env.TIKTOK_PIXEL_ID,
-      event,
-      timestamp,
-      context,
-      properties
+    const payload = {
+      pixel_code: PIXEL_ID,
+      event: "CompletePayment",
+      test_event_code: "TEST123456",
+      properties: {
+        value: 100,
+        currency: "USD",
+      },
     };
 
-    console.log("📤 Enviando a TikTok:", body);
-
-    const response = await fetch(tiktokURL, {
-      method: 'POST',
+    const response = await fetch("https://business-api.tiktok.com/open_api/v1.3/event/track/", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Token': process.env.TIKTOK_ACCESS_TOKEN
+        "Content-Type": "application/json",
+        "Access-Token": ACCESS_TOKEN,
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
-    console.log("📩 Respuesta TikTok:", data);
+    console.log("Respuesta de TikTok API:", data);
 
-    if (!response.ok) {
-      console.error("❌ Error en respuesta TikTok:", response.status, data);
-      return res.status(response.status).json({ error: 'TikTok API error', details: data });
-    }
-
-    res.status(200).json({ message: 'Evento enviado a TikTok', tiktokResponse: data });
-  } catch (error) {
-    console.error("🔥 Error inesperado:", error);
-    res.status(500).json({ error: 'Fallo al enviar evento a TikTok' });
+    return res.status(200).json({ message: "Evento enviado", data });
+  } catch (err) {
+    console.error("Error al enviar evento a TikTok:", err);
+    return res.status(500).json({ error: "Error al enviar evento" });
   }
 }
