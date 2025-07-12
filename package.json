@@ -7,7 +7,11 @@
     "start": "node api/index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "dotenv": "^16.3.1"
-  }
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2"
+  },
+  "description": "Este proyecto implementa una función serverless en Vercel para enviar eventos directamente a la API de TikTok desde el backend.",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
